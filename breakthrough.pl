@@ -12,7 +12,6 @@ columnToInt('G', 6).
 columnToInt('H', 7).
 
 
-
 initial_state(GameState) :-
     initialBoard(GameState),
     display_game(GameState).
@@ -43,22 +42,27 @@ printLine([Head|Tail]) :-
     printLine(Tail).
 
 
-initialBoard([[2,2,2,2,2,2,2,2],
-              [2,2,2,2,2,2,2,2],
-              [0,0,1,0,0,0,0,0],
+initialBoard([[1,3,3,2,2,3,3,1],
+              [1,1,1,1,1,1,1,1],
               [0,0,0,0,0,0,0,0],
               [0,0,0,0,0,0,0,0],
               [0,0,0,0,0,0,0,0],
-              [1,1,0,1,1,1,1,1],
-              [1,1,1,1,1,1,1,1]]).
+              [0,0,0,0,0,0,0,0],
+              [4,4,4,4,4,4,4,4],
+              [4,6,6,5,5,6,6,4]]).
 
 
 lineNumbers([8,7,6,5,4,3,2,1]).
 
 
 translate(0,' . ').
-translate(1,' W '). 
-translate(2,' B '). 
+translate(1,' B_MT').
+translate(2, 'B_HT').
+translate(3, 'B_TD').
+translate(4, 'W_MT').
+translate(5, 'W_HT').
+translate(6, 'W_TD').
+
 
 get_piece_pos(Column, Row):-
     repeat,
