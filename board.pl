@@ -17,12 +17,12 @@ display_game(X) :-
     display_game(X,Y).
 
 display_game([],[]) :-
-    write('  |---|---|---|---|---|---|---|---|'), nl,
-    write('    A   B   C   D   E   F   G   H  '), nl.
+    write('  |-----|-----|-----|-----|-----|-----|-----|-----|'), nl,
+    write('     A     B     C     D     E     F     G     H   '), nl.
 
 display_game([Line|Board],[LineNumb|Remainder]) :-
-    write('  |---|---|---|---|---|---|---|---|'), nl,
-    %write('  '),  nl,
+    write('  |-----|-----|-----|-----|-----|-----|-----|-----|'), nl,
+    %write('     '),  nl,
     write(LineNumb), write(' '),
     printLine(Line),
     write('|'), nl,
@@ -51,10 +51,10 @@ initialBoard([[1,3,3,2,2,3,3,1],
 lineNumbers([8,7,6,5,4,3,2,1]).
 
 
-translate(0,' . ').
-translate(1,' B_MT').
-translate(2, 'B_HT').
-translate(3, 'B_TD').
-translate(4, 'W_MT').
-translate(5, 'W_HT').
-translate(6, 'W_TD').
+translate(0, '  .  ').
+translate(1, 'B_MT ').
+translate(2, 'B_HT ').
+translate(3, 'B_TD ').
+translate(4, 'W_MT ').
+translate(5, 'W_HT ').
+translate(6, 'W_TD ').

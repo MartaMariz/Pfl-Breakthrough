@@ -22,6 +22,7 @@ game_mode:-
 		Input = '2' -> initial_state(GameState), play_pc( 1, GameState);
 		Input = '3' -> initial_state(GameState), play_pc_turn( 1, GameState);
 		Input = '4';
+		Input = '5';
 		nl,
 		write('Error: invalid input.'), nl,
 		press_enter, nl,
@@ -35,8 +36,9 @@ printgameModeMenu:-
 	write('=                               ='), nl,
 	write('=   1. Player vs. Player        ='), nl,
 	write('=   2. Player vs. Computer      ='), nl,
-	write('=   3. Computer vs. Player     ='), nl,
-	write('=   4. Back                     ='), nl,
+	write('=   3. Computer vs. Player      ='), nl,
+	write('=   4. Computer vs. Computer    ='), nl,
+	write('=   5. Back                     ='), nl,
 	write('=                               ='), nl,
 	write('================================='), nl,
 	write('Choose an option:'), nl.

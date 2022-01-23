@@ -17,13 +17,21 @@ initial_state(GameState) :-
 changePlayer(1,2).
 changePlayer(2,1).
 
+check_piece_belong_player(1, 4).
+check_piece_belong_player(1, 5).
+check_piece_belong_player(1, 6).
+check_piece_belong_player(2, 1).
+check_piece_belong_player(2, 2).
+check_piece_belong_player(2, 3).
+
 
 check_piece_pos(Column, Row, GameState, Player):- 
     nth0(Row, GameState, RowList),
     nth0(Column, RowList, Piece),
-    Player =:= Piece.
+    check_piece_belong_player(Player, Piece).
 
-    
+
+
 
 replace( [L|Ls] , 0 , C , Piece , [R|Ls] ) :- 
   replace_row(L,C,Piece,R).                                      
@@ -38,33 +46,209 @@ replace_row( [H|Cs] , C , Piece , [H|Rs] ) :-
   C1 is C-1 ,                                
   replace_row( Cs , C1 , Piece , Rs ). 
 
-check_collumn(CI, CF, _):- CF =:= CI - 1 .
-check_collumn(CI, CF, _):- CF =:= CI + 1 .
-check_collumn(CI, CF, Piece):- CF =:= CI, Piece =:= 0 .
 
-check_valid([CI-RI, CF-RF] ,1 , GameState):-
-    nth0(RF, GameState, RowList),
+
+/* checks if a player's piece if in the position CF-RF */
+check_if_player_already_piece([CF-RF],Player, GameState):- 
+    nth0(RF, GameState, RowList), 
     nth0(CF, RowList, Piece),
-    dif(1, Piece),
+    check_if_same_player_piece(Player, Piece).
+
+
+check_if_same_player_piece(2, Piece ):- dif(1, Piece),  dif(2,Piece),  dif(3, Piece).
+check_if_same_player_piece(1, Piece ):-  dif(4, Piece), dif(5,Piece), dif(6, Piece).
+
+/* if tank destroyer moves two rows, check if he didnt pass through one of his own (cant team kill sad) */
+check_valid([CI-RI, CF-RF] ,1 , GameState,6, ListOfSpacesToChange):-
+    check_if_player_already_piece([CF-RF] ,1 , GameState),
+    RF =:= RI - 2,
+    RF_1 is RI - 1, 
+    check_if_player_already_piece([CF-RF_1] ,1 , GameState),
+    write('there was no piece cool'),
+    check_collumn(CI, CF, 6),
+    check_row(RI, RF, 6),
+    clone([CI-RI, CI-RF_1], ListOfSpacesToChange), nl.
+
+/* if tank destroyer moves one row*/
+check_valid([CI-RI, CF-RF] ,1 , GameState,6, ListOfSpacesToChange):-
+    check_if_player_already_piece([CF-RF] ,1 , GameState),
     RF =:= RI - 1,
-    check_collumn(CI, CF, Piece).
+    check_collumn(CI, CF, 6),
+    check_row(RI, RF, 6),
+    clone([CI-RI], ListOfSpacesToChange).
 
-check_valid([CI-RI, CF-RF] ,2 , GameState):-
-    nth0(RF, GameState, RowList),
-    nth0(CF, RowList, Piece),
-    dif(2, Piece),
-    check_collumn(CI, CF, Piece),
-    RF =:= RI + 1.
+/* if tank destroyer moves two rows (black version), check if he didnt pass through one of his own (cant team kill sad) */
+check_valid([CI-RI, CF-RF] ,2 , GameState,3, ListOfSpacesToChange):-
+    check_if_player_already_piece([CF-RF] ,2, GameState),
+    RF =:= RI + 2,
+    RF_1 is RI + 1, 
+    check_if_player_already_piece([CF-RF_1] ,2 , GameState),
+    check_collumn(CI, CF, 3),
+    check_row(RI, RF, 3),
+    clone([CI-RI, CF-RF_1], ListOfSpacesToChange).
 
-move([CI-RI, CF-RF],Player , GameState, UpdatedGameState):-
-    check_valid([CI-RI, CF-RF], Player, GameState),
-    replace(GameState, RF, CF, Player, MidGameState ),
-    replace(MidGameState, RI, CI, 0, UpdatedGameState).    
+
+/* if tank destroyer moves one row (black version)*/
+check_valid([CI-RI, CF-RF] ,2 , GameState,3, ListOfSpacesToChange):-
+    check_if_player_already_piece([CF-RF] ,2 , GameState),
+    RF =:= RI + 1,
+    check_collumn(CI, CF, 3),
+    check_row(RI, RF, 3),
+    clone([CI-RI], ListOfSpacesToChange).
+
+
+
+check_row(RI, RF, 6):- RF =:= RI - 1.
+check_row(RI, RF, 6):- RF =:= RI - 2.
+check_collumn(CI, CF, 6):- CF =:= CI.
+
+
+
+check_row(RI, RF, 3):- RF =:= RI + 1.
+check_row(RI, RF, 3):- RF =:= RI + 2.
+check_collumn(CI, CF, 3):- CF =:= CI.
+
+/* if heavy tank moves one row (white version) , perform the same checks as the white medium tank 
+check_valid([CI-RI, CF-RF] ,1 , GameState,5, ListOfSpacesToChange):- 
+    write(CI-RI), nl,
+    write(CF-RF), nl,
+    write('    medium tank movement  '),nl,
+    RF =:= RI - 1,
+    check_valid([CI-RI, CF-RF] ,1 , GameState,4,ListOfSpacesToChange). */
+
+/* if heavy tank moves two rows (white version) in the same column, perform same checks as tank destroyer movement
+check_valid([CI-RI, CF-RF],1 , GameState,5, ListOfSpacesToChange):-
+    write(CI-RI), nl,
+    write(CF-RF), nl,
+    write('  moving in the same col  '),nl,
+    RF =:= RI - 2,
+    CF =:= CI,
+    check_valid([CI-RI, CF-RF] ,1 , GameState,6, ListOfSpacesToChange). */
+
+/* if heavy tank moves two rows (white version) in diagonal left, check if the piece before is not his own*/
+check_valid([CI-RI, CF-RF] ,1 , GameState,5, ListOfSpacesToChange):-
+    check_if_player_already_piece([CF-RF],1, GameState),
+    write(CI-RI), nl,
+    write(CF-RF), nl,
+    write('    diagonal left   '),nl,
+    RF =:= RI - 2,
+    CF =:= CI - 2,
+    CF_1 is CI - 1,
+    RF_1 is RI - 1,
+    check_if_player_already_piece([CF_1-RF_1],1, GameState),
+    clone([CI-RI, CF_1-RF_1], ListOfSpacesToChange).
+
+/* if heavy tank moves two rows (white version) in diagonal right, check if the piece before is not his own */
+check_valid([CI-RI, CF-RF] ,1 , GameState,5, ListOfSpacesToChange):-
+    check_if_player_already_piece([CF-RF],1, GameState),
+    RF =:= RI - 2,
+    CF =:= CI + 2,
+    CF_1 is CI + 1,
+    RF_1 is RI - 1,
+    write(CI-RI), nl,
+    write(CF-RF), nl,
+    write('RF_1: '),
+    write(RF_1),
+    write('    diagonal right   '),nl,
+    check_if_player_already_piece([CF_1-RF_1],1, GameState),
+    clone([CI-RI, CF_1-RF_1], ListOfSpacesToChange).
+
+ 
+
+/* if heavy tank moves two rows (black version) in the same column, perform same checks as black tank destroyer movement */
+check_valid([CI-RI, CF-RF] ,2 , GameState,2, ListOfSpacesToChange):-
+    RF =:= RI + 2,
+    CF =:= CI,
+    check_valid([CI-RI, CF-RF] ,2 , GameState,3,ListOfSpacesToChange).
+
+/* if heavy tank moves two rows (black version) in diagonal left, check if the piece before is not his own*/
+check_valid([CI-RI, CF-RF] ,2 , GameState,2, ListOfSpacesToChange):-
+    check_if_player_already_piece([CF-RF],2, GameState),
+    RF =:= RI + 2,
+    CF =:= CI - 2,
+    CF_1 is CI - 1,
+    RF_1 is RI + 1,
+    check_if_player_already_piece([CF_1-RF_1],2, GameState),
+    clone([CI-RI, CF_1-RF_1], ListOfSpacesToChange).
+
+/* if heavy tank moves two rows (black version) in diagonal right, check if the piece before is not his own*/
+check_valid([CI-RI, CF-RF] ,2 , GameState,2, ListOfSpacesToChange):-
+    check_if_player_already_piece([CF-RF],2, GameState),
+    RF =:= RI + 2,
+    CF =:= CI + 2,
+    CF_1 is CI + 1,
+    RF_1 is RI + 1,
+    check_if_player_already_piece([CF_1-RF_1],2, GameState),
+    clone([CI-RI, CF_1-RF_1], ListOfSpacesToChange).
+
+/* if heavy tank moves one row (black version) , perform the same checks as the black medium tank */
+check_valid([CI-RI, CF-RF] ,2 , GameState,2, ListOfSpacesToChange):- 
+    RF =:= RI + 1,
+    check_valid([CI-RI, CF-RF] ,2 , GameState,1,ListOfSpacesToChange).
+
+check_row(RI, RF, 1):- RF =:= RI + 1.
+check_row(RI, RF, 4):- RF =:= RI - 1.
+
+check_collumn(CI, CF, 1):- CF =:= CI - 1 .
+check_collumn(CI, CF, 1):- CF =:= CI + 1 .
+check_collumn(CI, CF, 1):- CF =:= CI.
+
+check_collumn(CI, CF, 4):- CF =:= CI + 1 .
+check_collumn(CI, CF, 4):- CF =:= CI - 1 .
+check_collumn(CI, CF, 4):- CF =:= CI.
+
+/*  Cases for medium tank of white and black team (piece 1 and 4) */
+check_valid([CI-RI, CF-RF] ,1 , GameState, 4,ListOfSpacesToChange):-
+    check_if_player_already_piece([CF-RF],1, GameState),
+    check_row(RI, RF, 4),
+    check_collumn(CI, CF, 4),
+    clone([CI-RI], ListOfSpacesToChange).
+
+check_valid([CI-RI, CF-RF] ,2 , GameState, 1, ListOfSpacesToChange):-
+    check_if_player_already_piece([CF-RF],2, GameState),
+    check_row(RI, RF, 1),
+    check_collumn(CI, CF, 1),
+    clone([CI-RI], ListOfSpacesToChange).
+
+
+/*  Replace the pieces he travelled through in case of left diagonal movement */
+replace_places_in_between(GameState, 1, MidGameState):-
+    RF =:= RI - 2,  
+    CF =:= CI - 2,
+    CF_1 is CI - 1,
+    RF_1 is RI - 1,
+    replace(GameState, RF_1, CF_1, 0, MidGameState).
+
+clone([],[]).
+clone([H|T],[H|Z]):- clone(T,Z).
+
+replace_places_in_between(GameState,[], MidGameState):- 
+    clone(GameState, MidGameState).
+
+replace_places_in_between(GameState,[C-R| T], MidGameState):-
+    replace(GameState, R, C, 0, IntermediateGameState),
+    replace_places_in_between(IntermediateGameState, T, MidGameState ).
+
+move([CI-RI, CF-RF], Player , GameState, UpdatedGameState):-
+    nth0(RI, GameState, RowList), 
+    nth0(CI, RowList, Piece),
+    check_valid([CI-RI, CF-RF], Player, GameState, Piece, ListOfSpacesToChange),
+    replace_places_in_between(GameState,ListOfSpacesToChange,  MidGameState),
+    replace(MidGameState, RF, CF, Piece, UpdatedGameState ).    
+
 
 
 valid_set_pos(CI,RI,CF,RF,GameState,Player):-
+    nth0(RI, GameState, RowList), 
+    nth0(CI, RowList, Piece),
     check_piece_pos(CI,RI, GameState, Player),
-    check_valid( [CI-RI, CF-RF], Player, GameState).
+    check_valid( [CI-RI, CF-RF], Player, GameState, Piece, _).
+
+
+valid_moves_piece(GameState, Player, [CI-RI], ListOfValidMoves):- 
+    nth0(RI, GameState, RowList), 
+    nth0(CI, RowList, Piece),
+    findall([CI-RI, CF-RF], check_valid([CI-RI, CF-RF], Player,GameState, Piece, _), ListOfValidMoves).
 
 
 
@@ -72,8 +256,12 @@ valid_moves(GameState, Player, ListOfMoves):-
     findall([CI-RI, CF-RF], valid_set_pos(CI,RI,CF,RF,GameState,Player), ListOfMoves).
 
 printa([]).
+printa([[A-B]|T]):-
+    write(A-B),nl,
+    printa(T).
+
 printa([[A-B, C-D]|T]):-
-    write(A-B), write(C-D),nl,
+    write(A-B),write('  '), write(C-D),nl,
     printa(T).
 
 play:-
@@ -83,11 +271,20 @@ get_move(Player,GameState, [CI-RI, CF-RF]):-
     write('Player '), write(Player), write(', it is your turn!'), nl,
     get_piece_pos(CI, RI),
     check_piece_pos(CI,RI, GameState, Player),
+    valid_moves_piece(GameState, Player,[CI-RI], ListOfValidMoves),
+    printa(ListOfValidMoves),
+    length(ListOfValidMoves, X),
+    dif(X, 0),
     get_dest_pos(CF, RF).
 
 
-check_end([H | T], Player):-
-    H =:= Player.
+check_end([1 | T], 2).
+check_end([2 | T], 2).
+check_end([3 | T], 2).
+
+check_end([4 | T], 1).
+check_end([5 | T], 1).
+check_end([6 | T], 1).
 
 check_end([H | T], Player):-
     check_end( T, Player).
@@ -98,6 +295,7 @@ check_end([], Player):- fail.
 game_over([First|_], 2, Winner):-
     check_end(First, 1),!,
     Winner is  1.
+
 
 game_over(GameState, 1, Winner):-
     length(GameState, NumRows),
