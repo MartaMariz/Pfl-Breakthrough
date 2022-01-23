@@ -20,8 +20,8 @@ game_mode:-
 	(
 		Input = '1' -> initial_state(GameState), play_pp( 1, GameState);
 		Input = '2' -> initial_state(GameState), play_pc( 1, GameState);
-		Input = '3' -> initial_state(GameState), play_pc_turn( 1, GameState);
-		Input = '4';
+		Input = '3' -> initial_state(GameState), play_pc_turn( 1, GameState, 0);
+		Input = '4' -> initial_state(GameState), play_pc_turn( 1, GameState, 1);
 		Input = '5';
 		nl,
 		write('Error: invalid input.'), nl,
