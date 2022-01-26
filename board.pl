@@ -12,6 +12,7 @@ columnToInt('G', 6).
 columnToInt('H', 7).
 
 
+
 display_game(X) :-
     lineNumbers(Y),
     display_game(X,Y).
@@ -58,3 +59,4 @@ translate(3, 'B_TD ').
 translate(4, 'W_MT ').
 translate(5, 'W_HT ').
 translate(6, 'W_TD ').
+

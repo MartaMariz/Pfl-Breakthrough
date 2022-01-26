@@ -10,7 +10,7 @@ main_menu :-
 
 		nl,	write('Error: invalid input.'), nl,
 		press_enter, nl, 
-		mainMenu
+		main_menu
 	).
 
 
@@ -74,9 +74,17 @@ print_instructions:-
 	write('=                                                                          ='), nl,
 	write('= The goal is to be th first to get to the other side of the board.        ='), nl,
 	write('=                                                                          ='), nl,
-	write('= Each piece can move one space froward or one space diagonally forward    ='), nl,
+	write('= Each piece can move one space froward or one space diagonally            ='), nl,
+	write('= in each direction forward.                                               ='), nl,
 	write('=                                                                          ='), nl,
-	write('= All pieces capture diagonally.                                           ='), nl,
+	write('= Medium Tanks can shoot in the same directions as piece movement          ='), nl,
+	write('=                                                                          ='), nl,
+	write('= Tank Destroyers can shoot up to two rows forward                         ='), nl,
+	write('=                                                                          ='), nl,
+	write('= Heavy Tanks can shoot where Medium Tanks shoot and where Tank destroyers ='), nl,
+	write('= shoot with an added 2-square diagonal shot in both direction             ='), nl,
+	write('=                                                                          ='), nl,
+	write('= All pieces move to the destroyed pieces position upon destroying it      ='), nl,
 	write('=                                                                          ='), nl,
 	write('= It is not possible to move to the space forward if there is an opponents ='), nl,
 	write('= piece                                                                    ='), nl,
